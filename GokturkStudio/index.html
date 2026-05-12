@@ -2,186 +2,86 @@
 <html lang="tr">
 
 <head>
-<meta charset="UTF-8">
-<title>GokturkLang Studio</title>
+    <meta charset="UTF-8">
+    <title>GokturkStudio</title>
 
-<style>
+    <style>
+        body {
+            margin: 0;
+            font-family: Consolas;
+            background: #1e1e1e;
+            color: white;
+        }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+        #editor {
+            width: 100%;
+            height: 70vh;
+            background: #111;
+            color: #0f0;
+            border: none;
+            outline: none;
+            padding: 10px;
+            font-size: 14px;
+        }
 
-body{
-    background:#1e1e1e;
-    color:white;
-    font-family:Consolas;
-    overflow:hidden;
-}
+        #bar {
+            padding: 10px;
+            background: #333;
+        }
 
-#topbar{
-    width:100%;
-    height:45px;
-    background:#111;
-    border-bottom:1px solid #333;
-    display:flex;
-    align-items:center;
-    padding-left:15px;
-    font-size:15px;
-}
-
-#container{
-    display:flex;
-    width:100%;
-    height:calc(100vh - 45px);
-}
-
-#sidebar{
-    width:220px;
-    background:#161616;
-    border-right:1px solid #333;
-    padding:10px;
-}
-
-#editor-area{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-}
-
-#editor{
-    flex:1;
-    background:#1e1e1e;
-    color:white;
-    border:none;
-    outline:none;
-    resize:none;
-    padding:15px;
-    font-size:15px;
-    line-height:1.5;
-}
-
-#terminal{
-    height:220px;
-    background:#0b0b0b;
-    color:#00ff66;
-    border-top:1px solid #333;
-    padding:10px;
-    overflow:auto;
-    font-size:14px;
-}
-
-button{
-    width:100%;
-    padding:12px;
-    border:none;
-    background:#2a2a2a;
-    color:white;
-    cursor:pointer;
-    margin-bottom:10px;
-    transition:0.2s;
-}
-
-button:hover{
-    background:#383838;
-}
-
-</style>
+        button {
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
 
-<div id="topbar">
-    GokturkLang Studio
-</div>
-
-<div id="container">
-
-    <div id="sidebar">
-
-        <button onclick="runCode()">
-            Çalıştır
-        </button>
-
+    <div id="bar">
+        <button onclick="runCode()">Çalıştır</button>
     </div>
 
-    <div id="editor-area">
+    <textarea id="editor">
+// GokturkLang Test
 
-<textarea id="editor">
-yazdır("Merhaba Dünya")
-</textarea>
+x = 5 + 8
+yazdır(x)
 
-<div id="terminal">
-Terminal hazır.
-</div>
-
-    </div>
-
-</div>
-
-<script>
-
-const Lexer =
-require("../GokturkLang/Core/lexer.js");
-
-const Parser =
-require("../GokturkLang/Core/parser.js");
-
-const Interpreter =
-require("../GokturkLang/Core/interpreter.js");
-
-function runCode(){
-
-    const code =
-    document.getElementById("editor").value;
-
-    const terminal =
-    document.getElementById("terminal");
-
-    terminal.innerHTML = "";
-
-    try{
-
-        const lexer =
-        new Lexer(code);
-
-        const tokens =
-        lexer.tokenize();
-
-        const parser =
-        new Parser(tokens);
-
-        const ast =
-        parser.parse();
-
-        const oldLog =
-        console.log;
-
-        console.log = function(message){
-
-            terminal.innerHTML +=
-            message + "<br>";
-        };
-
-        const interpreter =
-        new Interpreter();
-
-        interpreter.run(ast);
-
-        console.log = oldLog;
-    }
-
-    catch(err){
-
-        terminal.innerHTML =
-        "<span style='color:red;'>HATA:<br><br>" +
-        err +
-        "</span>";
-    }
+eğer (x > 10)
+{
+    yazdır("Büyük")
 }
+değilse
+{
+    yazdır("Küçük")
+}
+    </textarea>
 
-</script>
+    <script>
+        const { ipcRenderer } =
+            window.require ?
+            window.require("electron") :
+            {};
+
+        function runCode() {
+
+            const code =
+                document.getElementById("editor").value;
+
+            // Electron varsa output penceresine gönder
+            if (ipcRenderer) {
+
+                ipcRenderer.send(
+                    "run-code",
+                    code
+                );
+            }
+
+            console.log(code);
+        }
+    </script>
 
 </body>
+
 </html>

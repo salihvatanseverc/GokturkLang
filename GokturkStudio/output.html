@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>GokturkLang Output</title>
+
+    <style>
+        body {
+            background: #111;
+            color: white;
+            font-family: Consolas;
+            padding: 10px;
+        }
+
+        #output {
+            white-space: pre-wrap;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .warning {
+            color: orange;
+        }
+
+        .output {
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h3>Çıktı Paneli</h3>
+
+    <div id="output"></div>
+
+    <script>
+        const { ipcRenderer } =
+        window.require
+            ? window.require("electron")
+            : {};
+
+        const outputDiv =
+            document.getElementById("output");
+
+        function log(type, message) {
+
+            const line =
+                document.createElement("div");
+
+            line.className = type;
+            line.innerText = message;
+
+            outputDiv.appendChild(line);
+        }
+
+        // Editor'dan gelen veriyi dinle
+        if (ipcRenderer) {
+
+            ipcRenderer.on(
+                "output",
+                (event, data) => {
+
+                    log("output", data);
+                }
+            );
+        }
+
+        // TEST
+        log("output", "Sistem hazır");
+    </script>
+
+</body>
+
+</html>

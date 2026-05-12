@@ -1,153 +1,46 @@
-const {
-    app,
-    BrowserWindow,
-    Menu,
-    dialog
-} = require("electron");
+const { app, BrowserWindow, ipcMain } =
+require("electron");
 
-const path = require("path");
+let editorWindow;
+let outputWindow;
 
-function createWindow() {
+function createWindows() {
 
-    const win = new BrowserWindow({
-
-        width: 1400,
-        height: 900,
-
-        minWidth: 900,
-        minHeight: 600,
-
-        backgroundColor: "#1e1e1e",
-
-        title: "Salih Language IDE",
-
+    // EDITOR
+    editorWindow = new BrowserWindow({
+        width: 900,
+        height: 700,
         webPreferences: {
-
             nodeIntegration: true,
             contextIsolation: false
         }
     });
 
-    win.loadFile("index.html");
+    editorWindow.loadFile("index.html");
 
-    // GELİŞTİRİCİ ARAÇLARI
-    win.webContents.openDevTools();
-
-    // MENÜ
-
-    const template = [
-
-        {
-            label: "Dosya",
-
-            submenu: [
-
-                {
-                    label: "Yeni Dosya",
-
-                    click() {
-
-                        win.webContents.send(
-                            "new-file"
-                        );
-                    }
-                },
-
-                {
-                    label: "Kaydet",
-
-                    click() {
-
-                        win.webContents.send(
-                            "save-file"
-                        );
-                    }
-                },
-
-                {
-                    type: "separator"
-                },
-
-                {
-                    label: "Çıkış",
-
-                    click() {
-                        app.quit();
-                    }
-                }
-            ]
-        },
-
-        {
-            label: "Çalıştır",
-
-            submenu: [
-
-                {
-                    label: "Kodu Çalıştır",
-
-                    accelerator: "F5",
-
-                    click() {
-
-                        win.webContents.send(
-                            "run-code"
-                        );
-                    }
-                }
-            ]
-        },
-
-        {
-            label: "Yardım",
-
-            submenu: [
-
-                {
-                    label: "Hakkında",
-
-                    click() {
-
-                        dialog.showMessageBox(win, {
-
-                            title: "Hakkında",
-
-                            message:
-                                "Salih Language IDE",
-
-                            detail:
-                                "Electron tabanlı özel programlama dili editörü."
-                        });
-                    }
-                }
-            ]
-        }
-    ];
-
-    const menu =
-    Menu.buildFromTemplate(template);
-
-    Menu.setApplicationMenu(menu);
-}
-
-app.whenReady().then(() => {
-
-    createWindow();
-
-    app.on("activate", () => {
-
-        if (
-            BrowserWindow.getAllWindows().length === 0
-        ) {
-
-            createWindow();
+    // OUTPUT
+    outputWindow = new BrowserWindow({
+        width: 500,
+        height: 400,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
         }
     });
+
+    outputWindow.loadFile("output.html");
+}
+
+// Kod gönderme olayı
+ipcMain.on("run-code", (event, code) => {
+
+    // burada ileride lexer/parser çalışacak
+    console.log("Kod geldi:", code);
+
+    outputWindow.webContents.send(
+        "output",
+        code
+    );
 });
 
-app.on("window-all-closed", () => {
-
-    if (process.platform !== "darwin") {
-        app.quit();
-    }
-});
+app.whenReady().then(createWindows);
