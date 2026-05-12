@@ -1,7 +1,6 @@
 class Lexer {
 
     constructor(input) {
-
         this.input = input;
         this.position = 0;
         this.tokens = [];
@@ -17,13 +16,13 @@ class Lexer {
             let char =
                 this.input[this.position];
 
-            // boşluk
+            // boşluklar
             if (/\s/.test(char)) {
                 this.position++;
                 continue;
             }
 
-            // sayı
+            // sayılar
             if (/[0-9]/.test(char)) {
 
                 let number = "";
@@ -33,6 +32,7 @@ class Lexer {
                         this.input[this.position]
                     )
                 ) {
+
                     number +=
                         this.input[this.position];
 
@@ -55,9 +55,7 @@ class Lexer {
                 let string = "";
 
                 while (
-                    this.input[this.position] !== '"' &&
-                    this.position <
-                    this.input.length
+                    this.input[this.position] !== '"'
                 ) {
 
                     string +=
@@ -76,7 +74,7 @@ class Lexer {
                 continue;
             }
 
-            // identifier
+            // yazılar
             if (
                 /[a-zA-ZçğıöşüÇĞİÖŞÜ_]/.test(char)
             ) {
@@ -102,7 +100,24 @@ class Lexer {
                         value: text
                     });
 
-                } else {
+                }
+                else if (text === "eğer") {
+
+                    this.tokens.push({
+                        type: "EGER",
+                        value: text
+                    });
+
+                }
+                else if (text === "değilse") {
+
+                    this.tokens.push({
+                        type: "DEGILSE",
+                        value: text
+                    });
+
+                }
+                else {
 
                     this.tokens.push({
                         type: "IDENTIFIER",
@@ -150,6 +165,20 @@ class Lexer {
                     });
                     break;
 
+                case ">":
+                    this.tokens.push({
+                        type: "GREATER",
+                        value: ">"
+                    });
+                    break;
+
+                case "<":
+                    this.tokens.push({
+                        type: "LESS",
+                        value: "<"
+                    });
+                    break;
+
                 case "(":
                     this.tokens.push({
                         type: "LPAREN",
@@ -164,10 +193,25 @@ class Lexer {
                     });
                     break;
 
+                case "{":
+                    this.tokens.push({
+                        type: "LBRACE",
+                        value: "{"
+                    });
+                    break;
+
+                case "}":
+                    this.tokens.push({
+                        type: "RBRACE",
+                        value: "}"
+                    });
+                    break;
+
                 default:
 
                     throw new Error(
-                        "Bilinmeyen karakter: " + char
+                        "Bilinmeyen karakter: " +
+                        char
                     );
             }
 

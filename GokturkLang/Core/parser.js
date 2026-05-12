@@ -25,6 +25,10 @@ class Parser {
             return this.printStatement();
         }
 
+        if (this.match("EGER")) {
+            return this.ifStatement();
+        }
+
         if (
             this.check("IDENTIFIER") &&
             this.checkNext("EQUALS")
@@ -33,6 +37,60 @@ class Parser {
         }
 
         return this.expression();
+    }
+
+    ifStatement() {
+
+        this.consume("LPAREN");
+
+        const left =
+            this.expression();
+
+        const operator =
+            this.advance().value;
+
+        const right =
+            this.expression();
+
+        this.consume("RPAREN");
+
+        this.consume("LBRACE");
+
+        const body = [];
+
+        while (!this.check("RBRACE")) {
+            body.push(this.statement());
+        }
+
+        this.consume("RBRACE");
+
+        let elseBody = [];
+
+        if (this.match("DEGILSE")) {
+
+            this.consume("LBRACE");
+
+            while (!this.check("RBRACE")) {
+                elseBody.push(
+                    this.statement()
+                );
+            }
+
+            this.consume("RBRACE");
+        }
+
+        return {
+            type: "IfStatement",
+
+            condition: {
+                left,
+                operator,
+                right
+            },
+
+            body,
+            elseBody
+        };
     }
 
     variableDeclaration() {
@@ -69,7 +127,8 @@ class Parser {
 
     expression() {
 
-        let left = this.primary();
+        let left =
+            this.primary();
 
         while (
             this.match("PLUS") ||

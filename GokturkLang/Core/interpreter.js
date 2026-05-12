@@ -29,18 +29,18 @@ class Interpreter {
             case "NumberLiteral":
                 return node.value;
 
+            case "Identifier":
+
+                return this.variables[
+                    node.name
+                ];
+
             case "VariableDeclaration":
 
                 this.variables[node.name] =
                     this.evaluate(node.value);
 
                 return;
-
-            case "Identifier":
-
-                return this.variables[
-                    node.name
-                ];
 
             case "BinaryExpression":
 
@@ -67,12 +67,47 @@ class Interpreter {
 
                 return;
 
-            default:
+            case "IfStatement":
 
-                throw new Error(
-                    "Bilinmeyen node: " +
-                    node.type
-                );
+                const l =
+                    this.evaluate(
+                        node.condition.left
+                    );
+
+                const r =
+                    this.evaluate(
+                        node.condition.right
+                    );
+
+                let result = false;
+
+                switch (
+                    node.condition.operator
+                ) {
+
+                    case ">":
+                        result = l > r;
+                        break;
+
+                    case "<":
+                        result = l < r;
+                        break;
+                }
+
+                if (result) {
+
+                    for (const stmt of node.body) {
+                        this.evaluate(stmt);
+                    }
+
+                } else {
+
+                    for (const stmt of node.elseBody) {
+                        this.evaluate(stmt);
+                    }
+                }
+
+                return;
         }
     }
 }

@@ -1,68 +1,17 @@
-class Program {
+class IfStatement {
 
-    constructor(body) {
-        this.type = "Program";
+    constructor(condition, body, elseBody) {
+
+        this.type = "IfStatement";
+
+        this.condition = condition;
+
         this.body = body;
-    }
-}
 
-class PrintStatement {
-
-    constructor(value) {
-        this.type = "PrintStatement";
-        this.value = value;
-    }
-}
-
-class NumberLiteral {
-
-    constructor(value) {
-        this.type = "NumberLiteral";
-        this.value = value;
-    }
-}
-
-class StringLiteral {
-
-    constructor(value) {
-        this.type = "StringLiteral";
-        this.value = value;
-    }
-}
-
-class Identifier {
-
-    constructor(name) {
-        this.type = "Identifier";
-        this.name = name;
-    }
-}
-
-class VariableDeclaration {
-
-    constructor(name, value) {
-        this.type = "VariableDeclaration";
-        this.name = name;
-        this.value = value;
-    }
-}
-
-class BinaryExpression {
-
-    constructor(left, operator, right) {
-        this.type = "BinaryExpression";
-        this.left = left;
-        this.operator = operator;
-        this.right = right;
+        this.elseBody = elseBody;
     }
 }
 
 module.exports = {
-    Program,
-    PrintStatement,
-    NumberLiteral,
-    StringLiteral,
-    Identifier,
-    VariableDeclaration,
-    BinaryExpression
+    IfStatement
 };
