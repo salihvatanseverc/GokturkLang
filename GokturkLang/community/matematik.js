@@ -1,97 +1,56 @@
 class Matematik {
 
-    topla(a,b){
+    constructor() {}
 
-        if(
-            isNaN(a) ||
-            isNaN(b)
-        ){
-
-            throw new Error(
-                "Toplama işlemi yalnızca sayısal değerler ile gerçekleştirilebilir."
-            );
-        }
-
+    // TOPLAMA
+    TOPLA(a, b) {
         return a + b;
     }
 
-    cikar(a,b){
-
-        if(
-            isNaN(a) ||
-            isNaN(b)
-        ){
-
-            throw new Error(
-                "Çıkarma işlemi yalnızca sayısal değerler ile gerçekleştirilebilir."
-            );
-        }
-
+    // ÇIKARMA
+    CIKAR(a, b) {
         return a - b;
     }
 
-    carp(a,b){
-
-        if(
-            isNaN(a) ||
-            isNaN(b)
-        ){
-
-            throw new Error(
-                "Çarpma işlemi yalnızca sayısal değerler ile gerçekleştirilebilir."
-            );
-        }
-
+    // ÇARPMA
+    CARP(a, b) {
         return a * b;
     }
 
-    bol(a,b){
+    // BÖLME
+    BOL(a, b) {
 
-        if(
-            isNaN(a) ||
-            isNaN(b)
-        ){
-
-            throw new Error(
-                "Bölme işlemi yalnızca sayısal değerler ile gerçekleştirilebilir."
-            );
-        }
-
-        if(
-            b === 0
-        ){
-
-            throw new Error(
-                "Bir sayı sıfıra bölünemez."
-            );
+        if (b === 0) {
+            throw new Error("0'a bölme hatası");
         }
 
         return a / b;
     }
 
-    kok(a){
+    // ÜS ALMA
+    US(a, b) {
+        return Math.pow(a, b);
+    }
 
-        if(
-            isNaN(a)
-        ){
-
-            throw new Error(
-                "Karekök işlemi yalnızca sayısal değerler ile gerçekleştirilebilir."
-            );
-        }
-
-        if(
-            a < 0
-        ){
-
-            throw new Error(
-                "Negatif sayıların karekökü gerçek sayılar kümesinde tanımlı değildir."
-            );
-        }
-
+    // KAREKÖK
+    KAREKOK(a) {
         return Math.sqrt(a);
+    }
+
+    // MOD
+    MOD(a, b) {
+        return a % b;
+    }
+
+    // MAX
+    MAX(a, b) {
+        return Math.max(a, b);
+    }
+
+    // MIN
+    MIN(a, b) {
+        return Math.min(a, b);
     }
 }
 
-module.exports =
-Matematik;
+module.exports = Matematik;

@@ -1,133 +1,49 @@
 class Lexer {
 
     constructor(input) {
+
         this.input = input;
-        this.position = 0;
+        this.current = 0;
         this.tokens = [];
     }
 
     tokenize() {
 
-        while (
-            this.position <
-            this.input.length
-        ) {
+        while (!this.isAtEnd()) {
 
-            let char =
-                this.input[this.position];
+            let char = this.peek();
 
-            // boşluklar
+            // boşluk
             if (/\s/.test(char)) {
-                this.position++;
+                this.advance();
                 continue;
             }
 
-            // sayılar
+            // sayı
             if (/[0-9]/.test(char)) {
-
-                let number = "";
-
-                while (
-                    /[0-9]/.test(
-                        this.input[this.position]
-                    )
-                ) {
-
-                    number +=
-                        this.input[this.position];
-
-                    this.position++;
-                }
-
-                this.tokens.push({
-                    type: "NUMBER",
-                    value: number
-                });
-
+                this.tokens.push(
+                    this.number()
+                );
                 continue;
             }
 
             // string
             if (char === '"') {
-
-                this.position++;
-
-                let string = "";
-
-                while (
-                    this.input[this.position] !== '"'
-                ) {
-
-                    string +=
-                        this.input[this.position];
-
-                    this.position++;
-                }
-
-                this.position++;
-
-                this.tokens.push({
-                    type: "STRING",
-                    value: string
-                });
-
+                this.tokens.push(
+                    this.string()
+                );
                 continue;
             }
 
-            // yazılar
-            if (
-                /[a-zA-ZçğıöşüÇĞİÖŞÜ_]/.test(char)
-            ) {
-
-                let text = "";
-
-                while (
-                    /[a-zA-Z0-9çğıöşüÇĞİÖŞÜ_]/.test(
-                        this.input[this.position]
-                    )
-                ) {
-
-                    text +=
-                        this.input[this.position];
-
-                    this.position++;
-                }
-
-                if (text === "yazdır") {
-
-                    this.tokens.push({
-                        type: "YAZDIR",
-                        value: text
-                    });
-
-                }
-                else if (text === "eğer") {
-
-                    this.tokens.push({
-                        type: "EGER",
-                        value: text
-                    });
-
-                }
-                else if (text === "değilse") {
-
-                    this.tokens.push({
-                        type: "DEGILSE",
-                        value: text
-                    });
-
-                }
-                else {
-
-                    this.tokens.push({
-                        type: "IDENTIFIER",
-                        value: text
-                    });
-                }
-
+            // identifier
+            if (/[a-zA-ZçğıöşüÇĞİÖŞÜ_]/.test(char)) {
+                this.tokens.push(
+                    this.identifier()
+                );
                 continue;
             }
 
+            // operatörler
             switch (char) {
 
                 case "+":
@@ -165,20 +81,6 @@ class Lexer {
                     });
                     break;
 
-                case ">":
-                    this.tokens.push({
-                        type: "GREATER",
-                        value: ">"
-                    });
-                    break;
-
-                case "<":
-                    this.tokens.push({
-                        type: "LESS",
-                        value: "<"
-                    });
-                    break;
-
                 case "(":
                     this.tokens.push({
                         type: "LPAREN",
@@ -207,18 +109,132 @@ class Lexer {
                     });
                     break;
 
-                default:
+                case "[":
+                    this.tokens.push({
+                        type: "LBRACKET",
+                        value: "["
+                    });
+                    break;
 
+                case "]":
+                    this.tokens.push({
+                        type: "RBRACKET",
+                        value: "]"
+                    });
+                    break;
+
+                case ",":
+                    this.tokens.push({
+                        type: "COMMA",
+                        value: ","
+                    });
+                    break;
+
+                case ">":
+                    this.tokens.push({
+                        type: "GREATER",
+                        value: ">"
+                    });
+                    break;
+
+                case "<":
+                    this.tokens.push({
+                        type: "LESS",
+                        value: "<"
+                    });
+                    break;
+
+                default:
                     throw new Error(
-                        "Bilinmeyen karakter: " +
-                        char
+                        "Bilinmeyen karakter: " + char
                     );
             }
 
-            this.position++;
+            this.advance();
         }
 
         return this.tokens;
+    }
+
+    number() {
+
+        let value = "";
+
+        while (
+            !this.isAtEnd() &&
+            /[0-9]/.test(this.peek())
+        ) {
+            value += this.advance();
+        }
+
+        return {
+            type: "NUMBER",
+            value: Number(value)
+        };
+    }
+
+    string() {
+
+        this.advance();
+
+        let value = "";
+
+        while (
+            !this.isAtEnd() &&
+            this.peek() !== '"'
+        ) {
+            value += this.advance();
+        }
+
+        this.advance();
+
+        return {
+            type: "STRING",
+            value
+        };
+    }
+
+    identifier() {
+
+        let value = "";
+
+        while (
+            !this.isAtEnd() &&
+            /[a-zA-Z0-9çğıöşüÇĞİÖŞÜ_]/.test(this.peek())
+        ) {
+            value += this.advance();
+        }
+
+        // keyword kontrolü
+        const keywords = {
+
+            "yazdır": "YAZDIR",
+            "eğer": "IF",
+            "değilse": "ELSE",
+            "döngü": "LOOP",
+            "fonksiyon": "FUNCTION",
+            "return": "RETURN"
+        };
+
+        return {
+            type:
+                keywords[value] ||
+                "IDENTIFIER",
+
+            value
+        };
+    }
+
+    peek() {
+        return this.input[this.current];
+    }
+
+    advance() {
+        return this.input[this.current++];
+    }
+
+    isAtEnd() {
+        return this.current >= this.input.length;
     }
 }
 

@@ -1,15 +1,29 @@
-const { app, BrowserWindow, ipcMain } =
-require("electron");
+const {
+    app,
+    BrowserWindow,
+    ipcMain
+} = require("electron");
+
+const Lexer =
+require("./lexer");
+
+const Parser =
+require("./parser");
+
+const Interpreter =
+require("./interpreter");
 
 let editorWindow;
 let outputWindow;
 
 function createWindows() {
 
-    // EDITOR
+    // EDITOR WINDOW
     editorWindow = new BrowserWindow({
+
         width: 900,
         height: 700,
+
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
@@ -18,10 +32,12 @@ function createWindows() {
 
     editorWindow.loadFile("index.html");
 
-    // OUTPUT
+    // OUTPUT WINDOW
     outputWindow = new BrowserWindow({
+
         width: 500,
         height: 400,
+
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
@@ -31,16 +47,44 @@ function createWindows() {
     outputWindow.loadFile("output.html");
 }
 
-// Kod gönderme olayı
 ipcMain.on("run-code", (event, code) => {
 
-    // burada ileride lexer/parser çalışacak
-    console.log("Kod geldi:", code);
+    try {
 
-    outputWindow.webContents.send(
-        "output",
-        code
-    );
+        // LEXER
+        const lexer =
+            new Lexer(code);
+
+        const tokens =
+            lexer.tokenize();
+
+        // PARSER
+        const parser =
+            new Parser(tokens);
+
+        const ast =
+            parser.parse();
+
+        // INTERPRETER
+        const interpreter =
+            new Interpreter();
+
+        interpreter.run(ast);
+
+        // TEST OUTPUT
+        outputWindow.webContents.send(
+            "output",
+            "Kod çalıştı"
+        );
+
+    }
+    catch (err) {
+
+        outputWindow.webContents.send(
+            "error",
+            err.message
+        );
+    }
 });
 
 app.whenReady().then(createWindows);

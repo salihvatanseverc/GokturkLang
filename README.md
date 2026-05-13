@@ -16,4 +16,5 @@ GokturkLang Studio, GokturkLang programlama dili için geliştirilmiş Electron 
 ## Kurulum
 
 ```bash id="readme2"
-npm install
+
+indirilmiyor en yakın zamanda acılacak

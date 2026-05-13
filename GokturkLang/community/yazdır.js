@@ -1,21 +1,38 @@
-class Yazdır {
+class Yazdir {
 
-    execute(value) {
+    constructor(outputFn = console.log) {
+        this.output = outputFn;
+    }
 
-        if (
-            value === undefined ||
-            value === null
-        ) {
+    // temel yazdır
+    YAZDIR(value) {
+        this.output(String(value));
+    }
 
-            console.log(
-                "Boş değer"
-            );
+    // satır yazdır
+    SATIR(value) {
+        this.output(String(value) + "\n");
+    }
 
-            return;
+    // boş satır
+    BOS() {
+        this.output("");
+    }
+
+    // hata yazdır (kırmızı sistem için hazır)
+    HATA(message, line = null) {
+
+        if (line !== null) {
+            this.output("[HATA] " + message + " (satır " + line + ")");
+        } else {
+            this.output("[HATA] " + message);
         }
+    }
 
-        console.log(value);
+    // uyarı
+    UYARI(message) {
+        this.output("[UYARI] " + message);
     }
 }
 
-module.exports = Yazdır;
+module.exports = Yazdir;

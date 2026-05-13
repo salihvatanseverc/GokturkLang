@@ -3,48 +3,58 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>GokturkLang Output</title>
+    <title>GokturkLang Console</title>
 
     <style>
         body {
-            background: #111;
-            color: white;
+            margin: 0;
+            background: #0f0f0f;
             font-family: Consolas;
-            padding: 10px;
+            color: white;
         }
 
-        #output {
-            white-space: pre-wrap;
+        #console {
+            padding: 10px;
+            height: 100vh;
+            overflow-y: auto;
         }
 
         .error {
-            color: red;
+            color: #ff4d4d;
         }
 
         .warning {
-            color: orange;
+            color: #ffb84d;
         }
 
         .output {
-            color: white;
+            color: #ffffff;
+        }
+
+        .title {
+            background: #1a1a1a;
+            padding: 8px;
+            font-weight: bold;
         }
     </style>
 </head>
 
 <body>
 
-    <h3>Çıktı Paneli</h3>
+    <div class="title">
+        GokturkLang Output Console
+    </div>
 
-    <div id="output"></div>
+    <div id="console"></div>
 
     <script>
         const { ipcRenderer } =
-        window.require
+            window.require
             ? window.require("electron")
             : {};
 
-        const outputDiv =
-            document.getElementById("output");
+        const consoleDiv =
+            document.getElementById("console");
 
         function log(type, message) {
 
@@ -54,19 +64,29 @@
             line.className = type;
             line.innerText = message;
 
-            outputDiv.appendChild(line);
+            consoleDiv.appendChild(line);
+
+            consoleDiv.scrollTop =
+                consoleDiv.scrollHeight;
         }
 
-        // Editor'dan gelen veriyi dinle
+        // Electron'dan veri al
         if (ipcRenderer) {
 
-            ipcRenderer.on(
-                "output",
-                (event, data) => {
+            ipcRenderer.on("output", (event, data) => {
 
-                    log("output", data);
-                }
-            );
+                log("output", data);
+            });
+
+            ipcRenderer.on("error", (event, data) => {
+
+                log("error", data);
+            });
+
+            ipcRenderer.on("warning", (event, data) => {
+
+                log("warning", data);
+            });
         }
 
         // TEST

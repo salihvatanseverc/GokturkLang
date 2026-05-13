@@ -1,113 +1,195 @@
 class Interpreter {
 
-    constructor() {
-        this.variables = {};
+    constructor(modules) {
+
+        this.variables =
+            modules.variables;
+
+        this.functions =
+            modules.functions;
+
+        this.loops =
+            modules.loops;
+
+        this.conditions =
+            modules.conditions;
+
+        this.matematik =
+            modules.matematik;
+
+        this.stringler =
+            modules.stringler;
+
+        this.arrays =
+            modules.arrays;
+
+        this.random =
+            modules.random;
+
+        this.yazdir =
+            modules.yazdir;
     }
 
     run(ast) {
 
+        if (!ast || !ast.body) {
+            throw new Error("Geçersiz AST");
+        }
+
         for (const node of ast.body) {
-            this.evaluate(node);
+            this.execute(node);
+        }
+    }
+
+    execute(node) {
+
+        switch (node.type) {
+
+            // ======================
+            // PRINT
+            // ======================
+
+            case "PrintStatement":
+
+                this.yazdir.yaz(
+                    this.evaluate(node.value)
+                );
+
+                break;
+
+
+
+            // ======================
+            // VARIABLE
+            // ======================
+
+            case "VariableDeclaration":
+
+                this.variables.tanimla(
+                    node.name,
+                    this.evaluate(node.value)
+                );
+
+                break;
+
+
+
+            // ======================
+            // BINARY
+            // ======================
+
+            case "BinaryExpression":
+
+                return this.binary(node);
+
+
+
+            // ======================
+            // NUMBER
+            // ======================
+
+            case "NumberLiteral":
+
+                return node.value;
+
+
+
+            // ======================
+            // STRING
+            // ======================
+
+            case "StringLiteral":
+
+                return node.value;
+
+
+
+            // ======================
+            // IDENTIFIER
+            // ======================
+
+            case "Identifier":
+
+                return this.variables.al(
+                    node.name
+                );
+
+
+
+            default:
+
+                throw new Error(
+                    "Bilinmeyen node: " +
+                    node.type
+                );
         }
     }
 
     evaluate(node) {
+        return this.execute(node);
+    }
 
-        switch (node.type) {
+    binary(node) {
 
-            case "PrintStatement":
+        const left =
+            this.evaluate(node.left);
 
-                console.log(
-                    this.evaluate(node.value)
+        const right =
+            this.evaluate(node.right);
+
+        switch (node.operator) {
+
+            case "+":
+                return this.matematik.TOPLA(
+                    left,
+                    right
                 );
 
-                return;
+            case "-":
+                return this.matematik.CIKAR(
+                    left,
+                    right
+                );
 
-            case "StringLiteral":
-                return node.value;
+            case "*":
+                return this.matematik.CARP(
+                    left,
+                    right
+                );
 
-            case "NumberLiteral":
-                return node.value;
+            case "/":
+                return this.matematik.BOL(
+                    left,
+                    right
+                );
 
-            case "Identifier":
+            case ">":
+                return this.conditions.evaluate(
+                    left,
+                    ">",
+                    right
+                );
 
-                return this.variables[
-                    node.name
-                ];
+            case "<":
+                return this.conditions.evaluate(
+                    left,
+                    "<",
+                    right
+                );
 
-            case "VariableDeclaration":
+            case "==":
+                return this.conditions.evaluate(
+                    left,
+                    "==",
+                    right
+                );
 
-                this.variables[node.name] =
-                    this.evaluate(node.value);
+            default:
 
-                return;
-
-            case "BinaryExpression":
-
-                const left =
-                    this.evaluate(node.left);
-
-                const right =
-                    this.evaluate(node.right);
-
-                switch (node.operator) {
-
-                    case "+":
-                        return left + right;
-
-                    case "-":
-                        return left - right;
-
-                    case "*":
-                        return left * right;
-
-                    case "/":
-                        return left / right;
-                }
-
-                return;
-
-            case "IfStatement":
-
-                const l =
-                    this.evaluate(
-                        node.condition.left
-                    );
-
-                const r =
-                    this.evaluate(
-                        node.condition.right
-                    );
-
-                let result = false;
-
-                switch (
-                    node.condition.operator
-                ) {
-
-                    case ">":
-                        result = l > r;
-                        break;
-
-                    case "<":
-                        result = l < r;
-                        break;
-                }
-
-                if (result) {
-
-                    for (const stmt of node.body) {
-                        this.evaluate(stmt);
-                    }
-
-                } else {
-
-                    for (const stmt of node.elseBody) {
-                        this.evaluate(stmt);
-                    }
-                }
-
-                return;
+                throw new Error(
+                    "Geçersiz operator: " +
+                    node.operator
+                );
         }
     }
 }
