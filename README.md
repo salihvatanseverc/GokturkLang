@@ -1,6 +1,6 @@
 # GokturkLang Studio
 
-GokturkLang Studio, GokturkLang programlama dili için geliştirilmiş Electron tabanlı bir geliştirme ortamıdır.
+GokturkLang Studio, Göktürk programlama dili için geliştirilmiş Electron tabanlı bir geliştirme ortamıdır.
 
 ## Özellikler
 
