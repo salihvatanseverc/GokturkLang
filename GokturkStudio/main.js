@@ -1,90 +1,40 @@
-const {
-    app,
-    BrowserWindow,
-    ipcMain
-} = require("electron");
+const { app, BrowserWindow, Menu } = require("electron");
+const path = require("path");
 
-const Lexer =
-require("./lexer");
+let mainWindow;
 
-const Parser =
-require("./parser");
+function createWindow() {
 
-const Interpreter =
-require("./interpreter");
+    mainWindow = new BrowserWindow({
 
-let editorWindow;
-let outputWindow;
+        width: 1600,
+        height: 900,
 
-function createWindows() {
+        minWidth: 1200,
+        minHeight: 700,
 
-    // EDITOR WINDOW
-    editorWindow = new BrowserWindow({
-
-        width: 900,
-        height: 700,
+        title: "Göktürk Studio",
 
         webPreferences: {
+
             nodeIntegration: true,
             contextIsolation: false
         }
     });
 
-    editorWindow.loadFile("index.html");
+    mainWindow.loadFile(
+        path.join(__dirname, "UI", "index.html")
+    );
 
-    // OUTPUT WINDOW
-    outputWindow = new BrowserWindow({
-
-        width: 500,
-        height: 400,
-
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false
-        }
-    });
-
-    outputWindow.loadFile("output.html");
+    // 🔴 MENÜ KALDIR
+    Menu.setApplicationMenu(null);
 }
 
-ipcMain.on("run-code", (event, code) => {
+app.whenReady().then(createWindow);
 
-    try {
+app.on("window-all-closed", () => {
 
-        // LEXER
-        const lexer =
-            new Lexer(code);
-
-        const tokens =
-            lexer.tokenize();
-
-        // PARSER
-        const parser =
-            new Parser(tokens);
-
-        const ast =
-            parser.parse();
-
-        // INTERPRETER
-        const interpreter =
-            new Interpreter();
-
-        interpreter.run(ast);
-
-        // TEST OUTPUT
-        outputWindow.webContents.send(
-            "output",
-            "Kod çalıştı"
-        );
-
-    }
-    catch (err) {
-
-        outputWindow.webContents.send(
-            "error",
-            err.message
-        );
+    if (process.platform !== "darwin") {
+        app.quit();
     }
 });
-
-app.whenReady().then(createWindows);
