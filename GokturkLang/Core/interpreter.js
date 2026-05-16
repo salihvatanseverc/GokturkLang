@@ -1,43 +1,22 @@
 class Interpreter {
 
-    constructor(modules) {
+    constructor() {
 
-        this.variables =
-            modules.variables;
-
-        this.functions =
-            modules.functions;
-
-        this.loops =
-            modules.loops;
-
-        this.conditions =
-            modules.conditions;
-
-        this.matematik =
-            modules.matematik;
-
-        this.stringler =
-            modules.stringler;
-
-        this.arrays =
-            modules.arrays;
-
-        this.random =
-            modules.random;
-
-        this.yazdir =
-            modules.yazdir;
+        this.globals = new Map();
+        this.scopes = [this.globals];
     }
 
-    run(ast) {
+    run(program) {
 
-        if (!ast || !ast.body) {
-            throw new Error("Geçersiz AST");
-        }
+        try {
 
-        for (const node of ast.body) {
-            this.execute(node);
+            for (const statement of program.body) {
+                this.execute(statement);
+            }
+
+        } catch (error) {
+
+            console.error("Runtime Error:", error.message);
         }
     }
 
@@ -45,83 +24,28 @@ class Interpreter {
 
         switch (node.type) {
 
-            // ======================
-            // PRINT
-            // ======================
-
             case "PrintStatement":
-
-                this.yazdir.yaz(
-                    this.evaluate(node.value)
-                );
-
+                console.log(this.evaluate(node.value));
                 break;
-
-
-
-            // ======================
-            // VARIABLE
-            // ======================
 
             case "VariableDeclaration":
-
-                this.variables.tanimla(
-                    node.name,
-                    this.evaluate(node.value)
-                );
-
+                this.defineVariable(node.name, this.evaluate(node.value));
                 break;
 
-
-
-            // ======================
-            // BINARY
-            // ======================
-
             case "BinaryExpression":
-
-                return this.binary(node);
-
-
-
-            // ======================
-            // NUMBER
-            // ======================
+                return this.evaluateBinary(node);
 
             case "NumberLiteral":
-
                 return node.value;
-
-
-
-            // ======================
-            // STRING
-            // ======================
 
             case "StringLiteral":
-
                 return node.value;
 
-
-
-            // ======================
-            // IDENTIFIER
-            // ======================
-
             case "Identifier":
-
-                return this.variables.al(
-                    node.name
-                );
-
-
+                return this.lookupVariable(node.name);
 
             default:
-
-                throw new Error(
-                    "Bilinmeyen node: " +
-                    node.type
-                );
+                throw new Error("Unknown node type: " + node.type);
         }
     }
 
@@ -129,68 +53,47 @@ class Interpreter {
         return this.execute(node);
     }
 
-    binary(node) {
+    evaluateBinary(node) {
 
-        const left =
-            this.evaluate(node.left);
-
-        const right =
-            this.evaluate(node.right);
+        const left = this.evaluate(node.left);
+        const right = this.evaluate(node.right);
 
         switch (node.operator) {
 
             case "+":
-                return this.matematik.TOPLA(
-                    left,
-                    right
-                );
+                return left + right;
 
             case "-":
-                return this.matematik.CIKAR(
-                    left,
-                    right
-                );
+                return left - right;
 
             case "*":
-                return this.matematik.CARP(
-                    left,
-                    right
-                );
+                return left * right;
 
             case "/":
-                return this.matematik.BOL(
-                    left,
-                    right
-                );
 
-            case ">":
-                return this.conditions.evaluate(
-                    left,
-                    ">",
-                    right
-                );
+                if (right === 0) {
+                    throw new Error("Division by zero error");
+                }
 
-            case "<":
-                return this.conditions.evaluate(
-                    left,
-                    "<",
-                    right
-                );
-
-            case "==":
-                return this.conditions.evaluate(
-                    left,
-                    "==",
-                    right
-                );
-
-            default:
-
-                throw new Error(
-                    "Geçersiz operator: " +
-                    node.operator
-                );
+                return left / right;
         }
+    }
+
+    defineVariable(name, value) {
+
+        this.scopes[this.scopes.length - 1].set(name, value);
+    }
+
+    lookupVariable(name) {
+
+        for (let i = this.scopes.length - 1; i >= 0; i--) {
+
+            if (this.scopes[i].has(name)) {
+                return this.scopes[i].get(name);
+            }
+        }
+
+        throw new Error("Undefined variable: " + name);
     }
 }
 
