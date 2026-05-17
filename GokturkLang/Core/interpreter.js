@@ -27,9 +27,12 @@ class Interpreter {
 
             case "PrintStatement":
 
-                console.log(
-                    this.evaluate(node.value)
-                );
+                const output =
+                    node.values.map(value =>
+                        this.evaluate(value)
+                    );
+
+                console.log(...output);
 
                 break;
 
@@ -40,6 +43,7 @@ class Interpreter {
                 return node.value;
 
             default:
+
                 throw new Error(
                     "Unknown node type: " + node.type
                 );

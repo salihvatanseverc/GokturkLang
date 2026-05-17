@@ -9,22 +9,16 @@ const TOKENS = {
     IDENTIFIER: "IDENTIFIER",
 
     PRINT: "PRINT",
-    IF: "IF",
-    ELSE: "ELSE",
-    VARIABLE: "VARIABLE",
 
     PLUS: "PLUS",
     MINUS: "MINUS",
     STAR: "STAR",
     SLASH: "SLASH",
 
-    EQUALS: "EQUALS",
+    COMMA: "COMMA",
 
     LPAREN: "LPAREN",
     RPAREN: "RPAREN",
-
-    LBRACE: "LBRACE",
-    RBRACE: "RBRACE",
 
     EOF: "EOF"
 };

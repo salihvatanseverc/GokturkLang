@@ -21,6 +21,7 @@ class Parser {
         }
 
         return {
+
             type: "Program",
             body
         };
@@ -39,14 +40,25 @@ class Parser {
 
         this.consume(TOKENS.LPAREN);
 
-        const value = this.expression();
+        const values = [];
+
+        while (!this.check(TOKENS.RPAREN)) {
+
+            values.push(
+                this.expression()
+            );
+
+            if (!this.check(TOKENS.RPAREN)) {
+                this.consume(TOKENS.COMMA);
+            }
+        }
 
         this.consume(TOKENS.RPAREN);
 
         return {
 
             type: "PrintStatement",
-            value
+            values
         };
     }
 
@@ -60,6 +72,7 @@ class Parser {
         if (this.match(TOKENS.NUMBER)) {
 
             return {
+
                 type: "NumberLiteral",
                 value: this.previous().value
             };
@@ -68,12 +81,15 @@ class Parser {
         if (this.match(TOKENS.STRING)) {
 
             return {
+
                 type: "StringLiteral",
                 value: this.previous().value
             };
         }
 
-        throw new Error("Unexpected token");
+        throw new Error(
+            "Unexpected token"
+        );
     }
 
     match(type) {
@@ -93,7 +109,9 @@ class Parser {
             return this.advance();
         }
 
-        throw new Error("Expected token: " + type);
+        throw new Error(
+            "Expected token: " + type
+        );
     }
 
     check(type) {

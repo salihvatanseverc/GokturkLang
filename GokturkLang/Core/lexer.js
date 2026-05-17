@@ -21,6 +21,7 @@ class Lexer {
 
             // whitespace
             if (/\s/.test(char)) {
+
                 this.position++;
                 continue;
             }
@@ -37,6 +38,7 @@ class Lexer {
                 value += this.advance();
 
                 this.tokens.push({
+
                     type: TOKENS.NUMBER,
                     value: Number(value)
                 });
@@ -51,13 +53,18 @@ class Lexer {
 
                 let value = "";
 
-                while (this.peek() !== '"' && this.position < this.input.length) {
+                while (
+                    this.peek() !== '"' &&
+                    this.position < this.input.length
+                ) {
+
                     value += this.advance();
                 }
 
                 this.advance();
 
                 this.tokens.push({
+
                     type: TOKENS.STRING,
                     value
                 });
@@ -65,7 +72,7 @@ class Lexer {
                 continue;
             }
 
-            // identifiers / keywords
+            // identifiers
             if (/[a-zA-Z_]/.test(char)) {
 
                 let value = "";
@@ -78,15 +85,15 @@ class Lexer {
 
                 const keywords = {
 
-                    print: TOKENS.PRINT,
-                    if: TOKENS.IF,
-                    else: TOKENS.ELSE,
-                    variable: TOKENS.VARIABLE
+                    print: TOKENS.PRINT
                 };
 
                 this.tokens.push({
 
-                    type: keywords[value] || TOKENS.IDENTIFIER,
+                    type:
+                        keywords[value] ||
+                        TOKENS.IDENTIFIER,
+
                     value
                 });
 
@@ -100,11 +107,11 @@ class Lexer {
                 "-": TOKENS.MINUS,
                 "*": TOKENS.STAR,
                 "/": TOKENS.SLASH,
-                "=": TOKENS.EQUALS,
+
+                ",": TOKENS.COMMA,
+
                 "(": TOKENS.LPAREN,
-                ")": TOKENS.RPAREN,
-                "{": TOKENS.LBRACE,
-                "}": TOKENS.RBRACE
+                ")": TOKENS.RPAREN
             };
 
             if (operators[char]) {
@@ -119,7 +126,9 @@ class Lexer {
                 continue;
             }
 
-            throw new Error("Unexpected character: " + char);
+            throw new Error(
+                "Unexpected character: " + char
+            );
         }
 
         this.tokens.push({
