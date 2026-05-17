@@ -1,3 +1,9 @@
+// =========================
+// PARSER.JS
+// =========================
+
+const TOKENS = require("./tokens");
+
 class Parser {
 
     constructor(tokens) {
@@ -11,9 +17,7 @@ class Parser {
         const body = [];
 
         while (!this.isAtEnd()) {
-            body.push(
-                this.statement()
-            );
+            body.push(this.statement());
         }
 
         return {
@@ -24,174 +28,53 @@ class Parser {
 
     statement() {
 
-        // yazdır(...)
-        if (this.match("YAZDIR")) {
+        if (this.match(TOKENS.PRINT)) {
             return this.printStatement();
-        }
-
-        // değişken = değer
-        if (
-            this.check("IDENTIFIER") &&
-            this.checkNext("EQUALS")
-        ) {
-            return this.variableDeclaration();
         }
 
         return this.expression();
     }
 
-    // ======================
-    // PRINT
-    // ======================
-
     printStatement() {
 
-        this.consume("LPAREN");
+        this.consume(TOKENS.LPAREN);
 
-        const value =
-            this.expression();
+        const value = this.expression();
 
-        this.consume("RPAREN");
+        this.consume(TOKENS.RPAREN);
 
         return {
+
             type: "PrintStatement",
             value
         };
     }
 
-    // ======================
-    // VARIABLE
-    // ======================
-
-    variableDeclaration() {
-
-        const name =
-            this.advance().value;
-
-        this.consume("EQUALS");
-
-        const value =
-            this.expression();
-
-        return {
-            type:
-                "VariableDeclaration",
-
-            name,
-            value
-        };
-    }
-
-    // ======================
-    // EXPRESSIONS
-    // ======================
-
     expression() {
-        return this.addition();
+
+        return this.primary();
     }
-
-    addition() {
-
-        let expr =
-            this.multiplication();
-
-        while (
-            this.match("PLUS") ||
-            this.match("MINUS")
-        ) {
-
-            const operator =
-                this.previous().value;
-
-            const right =
-                this.multiplication();
-
-            expr = {
-                type:
-                    "BinaryExpression",
-
-                left: expr,
-                operator,
-                right
-            };
-        }
-
-        return expr;
-    }
-
-    multiplication() {
-
-        let expr =
-            this.primary();
-
-        while (
-            this.match("STAR") ||
-            this.match("SLASH")
-        ) {
-
-            const operator =
-                this.previous().value;
-
-            const right =
-                this.primary();
-
-            expr = {
-                type:
-                    "BinaryExpression",
-
-                left: expr,
-                operator,
-                right
-            };
-        }
-
-        return expr;
-    }
-
-    // ======================
-    // PRIMARY
-    // ======================
 
     primary() {
 
-        // sayı
-        if (this.match("NUMBER")) {
+        if (this.match(TOKENS.NUMBER)) {
 
             return {
                 type: "NumberLiteral",
-                value:
-                    this.previous().value
+                value: this.previous().value
             };
         }
 
-        // string
-        if (this.match("STRING")) {
+        if (this.match(TOKENS.STRING)) {
 
             return {
                 type: "StringLiteral",
-                value:
-                    this.previous().value
+                value: this.previous().value
             };
         }
 
-        // identifier
-        if (this.match("IDENTIFIER")) {
-
-            return {
-                type: "Identifier",
-                name:
-                    this.previous().value
-            };
-        }
-
-        throw new Error(
-            "Beklenmeyen token"
-        );
+        throw new Error("Unexpected token");
     }
-
-    // ======================
-    // HELPERS
-    // ======================
 
     match(type) {
 
@@ -210,9 +93,7 @@ class Parser {
             return this.advance();
         }
 
-        throw new Error(
-            type + " bekleniyordu"
-        );
+        throw new Error("Expected token: " + type);
     }
 
     check(type) {
@@ -221,25 +102,7 @@ class Parser {
             return false;
         }
 
-        return (
-            this.peek().type === type
-        );
-    }
-
-    checkNext(type) {
-
-        if (
-            this.current + 1 >=
-            this.tokens.length
-        ) {
-            return false;
-        }
-
-        return (
-            this.tokens[
-                this.current + 1
-            ].type === type
-        );
+        return this.peek().type === type;
     }
 
     advance() {
@@ -252,10 +115,8 @@ class Parser {
     }
 
     isAtEnd() {
-        return (
-            this.current >=
-            this.tokens.length
-        );
+
+        return this.peek().type === TOKENS.EOF;
     }
 
     peek() {
@@ -263,9 +124,7 @@ class Parser {
     }
 
     previous() {
-        return this.tokens[
-            this.current - 1
-        ];
+        return this.tokens[this.current - 1];
     }
 }
 
