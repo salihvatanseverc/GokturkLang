@@ -9,6 +9,8 @@ const TOKENS = {
     IDENTIFIER: "IDENTIFIER",
 
     PRINT: "PRINT",
+    FUNCTION: "FUNCTION",
+    RETURN: "RETURN",
 
     PLUS: "PLUS",
     MINUS: "MINUS",
@@ -19,6 +21,9 @@ const TOKENS = {
 
     LPAREN: "LPAREN",
     RPAREN: "RPAREN",
+
+    LBRACE: "LBRACE",
+    RBRACE: "RBRACE",
 
     EOF: "EOF"
 };

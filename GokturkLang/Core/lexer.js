@@ -1,8 +1,5 @@
-// =========================
-// LEXER.JS
-// =========================
-
 const TOKENS = require("./tokens");
+const GöktürkError = require("./errors");
 
 class Lexer {
 
@@ -19,14 +16,11 @@ class Lexer {
 
             let char = this.input[this.position];
 
-            // whitespace
             if (/\s/.test(char)) {
-
                 this.position++;
                 continue;
             }
 
-            // numbers
             if (/[0-9]/.test(char)) {
 
                 let value = "";
@@ -38,7 +32,6 @@ class Lexer {
                 value += this.advance();
 
                 this.tokens.push({
-
                     type: TOKENS.NUMBER,
                     value: Number(value)
                 });
@@ -46,7 +39,6 @@ class Lexer {
                 continue;
             }
 
-            // strings
             if (char === '"') {
 
                 this.advance();
@@ -57,14 +49,12 @@ class Lexer {
                     this.peek() !== '"' &&
                     this.position < this.input.length
                 ) {
-
                     value += this.advance();
                 }
 
                 this.advance();
 
                 this.tokens.push({
-
                     type: TOKENS.STRING,
                     value
                 });
@@ -72,7 +62,6 @@ class Lexer {
                 continue;
             }
 
-            // identifiers
             if (/[a-zA-Z_]/.test(char)) {
 
                 let value = "";
@@ -89,18 +78,15 @@ class Lexer {
                 };
 
                 this.tokens.push({
-
                     type:
                         keywords[value] ||
                         TOKENS.IDENTIFIER,
-
                     value
                 });
 
                 continue;
             }
 
-            // operators
             const operators = {
 
                 "+": TOKENS.PLUS,
@@ -117,7 +103,6 @@ class Lexer {
             if (operators[char]) {
 
                 this.tokens.push({
-
                     type: operators[char],
                     value: char
                 });
@@ -126,8 +111,9 @@ class Lexer {
                 continue;
             }
 
-            throw new Error(
-                "Unexpected character: " + char
+            throw new GöktürkError(
+                "Unexpected character: " + char,
+                "LexerError"
             );
         }
 

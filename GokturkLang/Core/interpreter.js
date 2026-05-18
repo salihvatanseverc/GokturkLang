@@ -1,6 +1,4 @@
-// =========================
-// INTERPRETER.JS
-// =========================
+const GöktürkError = require("./errors");
 
 class Interpreter {
 
@@ -8,16 +6,25 @@ class Interpreter {
 
         try {
 
-            for (const statement of program.body) {
-                this.execute(statement);
+            for (const stmt of program.body) {
+                this.execute(stmt);
             }
 
         } catch (error) {
 
-            console.error(
-                "Runtime Error:",
-                error.message
-            );
+            if (error instanceof GöktürkError) {
+
+                console.error(
+                    error.format()
+                );
+
+            } else {
+
+                console.error(
+                    "[UnknownError]",
+                    error.message
+                );
+            }
         }
     }
 
@@ -28,8 +35,8 @@ class Interpreter {
             case "PrintStatement":
 
                 const output =
-                    node.values.map(value =>
-                        this.evaluate(value)
+                    node.values.map(v =>
+                        this.evaluate(v)
                     );
 
                 console.log(...output);
@@ -44,8 +51,9 @@ class Interpreter {
 
             default:
 
-                throw new Error(
-                    "Unknown node type: " + node.type
+                throw new GöktürkError(
+                    "Unknown node type: " + node.type,
+                    "RuntimeError"
                 );
         }
     }

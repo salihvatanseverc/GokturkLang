@@ -1,8 +1,5 @@
-// =========================
-// PARSER.JS
-// =========================
-
 const TOKENS = require("./tokens");
+const GöktürkError = require("./errors");
 
 class Parser {
 
@@ -44,9 +41,7 @@ class Parser {
 
         while (!this.check(TOKENS.RPAREN)) {
 
-            values.push(
-                this.expression()
-            );
+            values.push(this.expression());
 
             if (!this.check(TOKENS.RPAREN)) {
                 this.consume(TOKENS.COMMA);
@@ -63,7 +58,6 @@ class Parser {
     }
 
     expression() {
-
         return this.primary();
     }
 
@@ -72,7 +66,6 @@ class Parser {
         if (this.match(TOKENS.NUMBER)) {
 
             return {
-
                 type: "NumberLiteral",
                 value: this.previous().value
             };
@@ -81,21 +74,20 @@ class Parser {
         if (this.match(TOKENS.STRING)) {
 
             return {
-
                 type: "StringLiteral",
                 value: this.previous().value
             };
         }
 
-        throw new Error(
-            "Unexpected token"
+        throw new GöktürkError(
+            "Unexpected token",
+            "ParserError"
         );
     }
 
     match(type) {
 
         if (this.check(type)) {
-
             this.advance();
             return true;
         }
@@ -109,8 +101,9 @@ class Parser {
             return this.advance();
         }
 
-        throw new Error(
-            "Expected token: " + type
+        throw new GöktürkError(
+            "Expected token: " + type,
+            "ParserError"
         );
     }
 
