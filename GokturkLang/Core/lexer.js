@@ -1,5 +1,6 @@
+// LEXER.JS
+
 const TOKENS = require("./tokens");
-const GöktürkError = require("./errors");
 
 class Lexer {
 
@@ -32,6 +33,7 @@ class Lexer {
                 value += this.advance();
 
                 this.tokens.push({
+
                     type: TOKENS.NUMBER,
                     value: Number(value)
                 });
@@ -49,12 +51,14 @@ class Lexer {
                     this.peek() !== '"' &&
                     this.position < this.input.length
                 ) {
+
                     value += this.advance();
                 }
 
                 this.advance();
 
                 this.tokens.push({
+
                     type: TOKENS.STRING,
                     value
                 });
@@ -74,36 +78,77 @@ class Lexer {
 
                 const keywords = {
 
-                    print: TOKENS.PRINT
+                    print: TOKENS.PRINT,
+                    if: TOKENS.IF,
+                    else: TOKENS.ELSE
                 };
 
                 this.tokens.push({
+
                     type:
-                        keywords[value] ||
-                        TOKENS.IDENTIFIER,
+                        keywords[value],
+
                     value
                 });
 
                 continue;
             }
 
-            const operators = {
-
-                "+": TOKENS.PLUS,
-                "-": TOKENS.MINUS,
-                "*": TOKENS.STAR,
-                "/": TOKENS.SLASH,
-
-                ",": TOKENS.COMMA,
-
-                "(": TOKENS.LPAREN,
-                ")": TOKENS.RPAREN
-            };
-
-            if (operators[char]) {
+            if (char === ">") {
 
                 this.tokens.push({
-                    type: operators[char],
+
+                    type: TOKENS.GREATER,
+                    value: ">"
+                });
+
+                this.advance();
+                continue;
+            }
+
+            if (char === "<") {
+
+                this.tokens.push({
+
+                    type: TOKENS.LESS,
+                    value: "<"
+                });
+
+                this.advance();
+                continue;
+            }
+
+            if (
+                char === "=" &&
+                this.input[this.position + 1] === "="
+            ) {
+
+                this.tokens.push({
+
+                    type: TOKENS.EQUAL_EQUAL,
+                    value: "=="
+                });
+
+                this.advance();
+                this.advance();
+
+                continue;
+            }
+
+            const symbols = {
+
+                "(": TOKENS.LPAREN,
+                ")": TOKENS.RPAREN,
+
+                "{": TOKENS.LBRACE,
+                "}": TOKENS.RBRACE
+            };
+
+            if (symbols[char]) {
+
+                this.tokens.push({
+
+                    type: symbols[char],
                     value: char
                 });
 
@@ -111,9 +156,8 @@ class Lexer {
                 continue;
             }
 
-            throw new GöktürkError(
-                "Unexpected character: " + char,
-                "LexerError"
+            throw new Error(
+                "Unexpected character: " + char
             );
         }
 

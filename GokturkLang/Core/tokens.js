@@ -1,23 +1,35 @@
-// =========================
 // TOKENS.JS
-// =========================
 
 const TOKENS = {
 
     NUMBER: "NUMBER",
     STRING: "STRING",
+
     IDENTIFIER: "IDENTIFIER",
 
     PRINT: "PRINT",
-    FUNCTION: "FUNCTION",
-    RETURN: "RETURN",
 
-    PLUS: "PLUS",
-    MINUS: "MINUS",
-    STAR: "STAR",
-    SLASH: "SLASH",
+    IF: "IF",
+    ELSE: "ELSE",
 
-    COMMA: "COMMA",
+    LET: "LET",
+
+    TRUE: "TRUE",
+    FALSE: "FALSE",
+
+    GREATER: "GREATER",
+    LESS: "LESS",
+
+    GREATER_EQUAL: "GREATER_EQUAL",
+    LESS_EQUAL: "LESS_EQUAL",
+
+    EQUAL_EQUAL: "EQUAL_EQUAL",
+    BANG_EQUAL: "BANG_EQUAL",
+
+    AND_AND: "AND_AND",
+    OR_OR: "OR_OR",
+
+    EQUAL: "EQUAL",
 
     LPAREN: "LPAREN",
     RPAREN: "RPAREN",

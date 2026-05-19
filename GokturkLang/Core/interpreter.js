@@ -1,30 +1,16 @@
-const GöktürkError = require("./errors");
+// INTERPRETER.JS
 
 class Interpreter {
 
+    constructor() {
+
+        this.variables = {};
+    }
+
     run(program) {
 
-        try {
-
-            for (const stmt of program.body) {
-                this.execute(stmt);
-            }
-
-        } catch (error) {
-
-            if (error instanceof GöktürkError) {
-
-                console.error(
-                    error.format()
-                );
-
-            } else {
-
-                console.error(
-                    "[UnknownError]",
-                    error.message
-                );
-            }
+        for (const stmt of program.body) {
+            this.execute(stmt);
         }
     }
 
@@ -32,16 +18,53 @@ class Interpreter {
 
         switch (node.type) {
 
-            case "PrintStatement":
+            case "VariableDeclaration":
 
-                const output =
-                    node.values.map(v =>
-                        this.evaluate(v)
-                    );
-
-                console.log(...output);
+                this.variables[node.name] =
+                    this.evaluate(node.value);
 
                 break;
+
+            case "PrintStatement":
+
+                console.log(
+                    this.evaluate(node.value)
+                );
+
+                break;
+
+            case "IfStatement":
+
+                const result =
+                    this.evaluateCondition(node.test);
+
+                if (result) {
+
+                    for (const stmt of node.consequent) {
+                        this.execute(stmt);
+                    }
+
+                } else if (node.alternate) {
+
+                    for (const stmt of node.alternate) {
+                        this.execute(stmt);
+                    }
+                }
+
+                break;
+
+            case "Identifier":
+
+                if (
+                    this.variables.hasOwnProperty(node.name)
+                ) {
+
+                    return this.variables[node.name];
+                }
+
+                throw new Error(
+                    "Undefined variable: " + node.name
+                );
 
             case "NumberLiteral":
                 return node.value;
@@ -49,17 +72,51 @@ class Interpreter {
             case "StringLiteral":
                 return node.value;
 
-            default:
-
-                throw new GöktürkError(
-                    "Unknown node type: " + node.type,
-                    "RuntimeError"
-                );
+            case "BooleanLiteral":
+                return node.value;
         }
     }
 
     evaluate(node) {
         return this.execute(node);
+    }
+
+    evaluateCondition(test) {
+
+        const left =
+            this.evaluate(test.left);
+
+        const right =
+            this.evaluate(test.right);
+
+        switch (test.operator) {
+
+            case ">":
+                return left > right;
+
+            case "<":
+                return left < right;
+
+            case ">=":
+                return left >= right;
+
+            case "<=":
+                return left <= right;
+
+            case "==":
+                return left == right;
+
+            case "!=":
+                return left != right;
+
+            case "&&":
+                return left && right;
+
+            case "||":
+                return left || right;
+        }
+
+        return false;
     }
 }
 

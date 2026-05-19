@@ -1,5 +1,4 @@
 const TOKENS = require("./tokens");
-const GöktürkError = require("./errors");
 
 class Parser {
 
@@ -30,42 +29,112 @@ class Parser {
             return this.printStatement();
         }
 
+        if (this.match(TOKENS.IF)) {
+            return this.ifStatement();
+        }
+
+        if (this.match(TOKENS.LET)) {
+            return this.variableDeclaration();
+        }
+
         return this.expression();
+    }
+
+    variableDeclaration() {
+
+        const name =
+            this.consume(TOKENS.IDENTIFIER).value;
+
+        this.consume(TOKENS.EQUAL);
+
+        const value =
+            this.expression();
+
+        return {
+
+            type: "VariableDeclaration",
+            name,
+            value
+        };
+    }
+
+    ifStatement() {
+
+        this.consume(TOKENS.LPAREN);
+
+        const left =
+            this.expression();
+
+        const operator =
+            this.advance().value;
+
+        const right =
+            this.expression();
+
+        this.consume(TOKENS.RPAREN);
+
+        this.consume(TOKENS.LBRACE);
+
+        const consequent = [];
+
+        while (!this.check(TOKENS.RBRACE)) {
+            consequent.push(this.statement());
+        }
+
+        this.consume(TOKENS.RBRACE);
+
+        let alternate = null;
+
+        if (this.match(TOKENS.ELSE)) {
+
+            this.consume(TOKENS.LBRACE);
+
+            alternate = [];
+
+            while (!this.check(TOKENS.RBRACE)) {
+                alternate.push(this.statement());
+            }
+
+            this.consume(TOKENS.RBRACE);
+        }
+
+        return {
+
+            type: "IfStatement",
+
+            test: {
+                left,
+                operator,
+                right
+            },
+
+            consequent,
+            alternate
+        };
     }
 
     printStatement() {
 
         this.consume(TOKENS.LPAREN);
 
-        const values = [];
-
-        while (!this.check(TOKENS.RPAREN)) {
-
-            values.push(this.expression());
-
-            if (!this.check(TOKENS.RPAREN)) {
-                this.consume(TOKENS.COMMA);
-            }
-        }
+        const value =
+            this.expression();
 
         this.consume(TOKENS.RPAREN);
 
         return {
 
             type: "PrintStatement",
-            values
+            value
         };
     }
 
     expression() {
-        return this.primary();
-    }
-
-    primary() {
 
         if (this.match(TOKENS.NUMBER)) {
 
             return {
+
                 type: "NumberLiteral",
                 value: this.previous().value
             };
@@ -74,20 +143,48 @@ class Parser {
         if (this.match(TOKENS.STRING)) {
 
             return {
+
                 type: "StringLiteral",
                 value: this.previous().value
             };
         }
 
-        throw new GöktürkError(
-            "Unexpected token",
-            "ParserError"
+        if (this.match(TOKENS.TRUE)) {
+
+            return {
+
+                type: "BooleanLiteral",
+                value: true
+            };
+        }
+
+        if (this.match(TOKENS.FALSE)) {
+
+            return {
+
+                type: "BooleanLiteral",
+                value: false
+            };
+        }
+
+        if (this.match(TOKENS.IDENTIFIER)) {
+
+            return {
+
+                type: "Identifier",
+                name: this.previous().value
+            };
+        }
+
+        throw new Error(
+            "Unexpected token"
         );
     }
 
     match(type) {
 
         if (this.check(type)) {
+
             this.advance();
             return true;
         }
@@ -101,9 +198,8 @@ class Parser {
             return this.advance();
         }
 
-        throw new GöktürkError(
-            "Expected token: " + type,
-            "ParserError"
+        throw new Error(
+            type + " expected"
         );
     }
 
