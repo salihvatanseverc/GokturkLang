@@ -3,7 +3,6 @@ const TOKENS = require("./tokens");
 class Parser {
 
     constructor(tokens) {
-
         this.tokens = tokens;
         this.current = 0;
     }
@@ -17,7 +16,6 @@ class Parser {
         }
 
         return {
-
             type: "Program",
             body
         };
@@ -51,7 +49,6 @@ class Parser {
             this.expression();
 
         return {
-
             type: "VariableDeclaration",
             name,
             value
@@ -77,7 +74,10 @@ class Parser {
 
         const consequent = [];
 
-        while (!this.check(TOKENS.RBRACE)) {
+        while (
+            !this.check(TOKENS.RBRACE) &&
+            !this.isAtEnd()
+        ) {
             consequent.push(this.statement());
         }
 
@@ -91,7 +91,10 @@ class Parser {
 
             alternate = [];
 
-            while (!this.check(TOKENS.RBRACE)) {
+            while (
+                !this.check(TOKENS.RBRACE) &&
+                !this.isAtEnd()
+            ) {
                 alternate.push(this.statement());
             }
 
@@ -103,6 +106,7 @@ class Parser {
             type: "IfStatement",
 
             test: {
+                type: "BinaryExpression",
                 left,
                 operator,
                 right
@@ -123,68 +127,120 @@ class Parser {
         this.consume(TOKENS.RPAREN);
 
         return {
-
             type: "PrintStatement",
             value
         };
     }
 
     expression() {
+        return this.term();
+    }
+
+    term() {
+
+        let expr = this.factor();
+
+        while (
+            this.match(TOKENS.PLUS) ||
+            this.match(TOKENS.MINUS)
+        ) {
+
+            const operator =
+                this.previous().value;
+
+            const right =
+                this.factor();
+
+            expr = {
+                type: "BinaryExpression",
+                left: expr,
+                operator,
+                right
+            };
+        }
+
+        return expr;
+    }
+
+    factor() {
+
+        let expr = this.primary();
+
+        while (
+            this.match(TOKENS.STAR) ||
+            this.match(TOKENS.SLASH)
+        ) {
+
+            const operator =
+                this.previous().value;
+
+            const right =
+                this.primary();
+
+            expr = {
+                type: "BinaryExpression",
+                left: expr,
+                operator,
+                right
+            };
+        }
+
+        return expr;
+    }
+
+    primary() {
 
         if (this.match(TOKENS.NUMBER)) {
-
             return {
-
                 type: "NumberLiteral",
                 value: this.previous().value
             };
         }
 
         if (this.match(TOKENS.STRING)) {
-
             return {
-
                 type: "StringLiteral",
                 value: this.previous().value
             };
         }
 
         if (this.match(TOKENS.TRUE)) {
-
             return {
-
                 type: "BooleanLiteral",
                 value: true
             };
         }
 
         if (this.match(TOKENS.FALSE)) {
-
             return {
-
                 type: "BooleanLiteral",
                 value: false
             };
         }
 
         if (this.match(TOKENS.IDENTIFIER)) {
-
             return {
-
                 type: "Identifier",
                 name: this.previous().value
             };
         }
 
-        throw new Error(
-            "Unexpected token"
-        );
+        if (this.match(TOKENS.LPAREN)) {
+
+            const expr =
+                this.expression();
+
+            this.consume(TOKENS.RPAREN);
+
+            return expr;
+        }
+
+        throw new Error("Unexpected token");
     }
 
     match(type) {
 
         if (this.check(type)) {
-
             this.advance();
             return true;
         }
@@ -198,9 +254,7 @@ class Parser {
             return this.advance();
         }
 
-        throw new Error(
-            type + " expected"
-        );
+        throw new Error(type + " expected");
     }
 
     check(type) {
@@ -222,7 +276,6 @@ class Parser {
     }
 
     isAtEnd() {
-
         return this.peek().type === TOKENS.EOF;
     }
 

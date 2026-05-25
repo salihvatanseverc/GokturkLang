@@ -1,8 +1,7 @@
-// core/lexer.js
-
 const TOKENS = require("./tokens");
 
 class Lexer {
+
     constructor(input) {
         this.input = input;
         this.position = 0;
@@ -10,7 +9,17 @@ class Lexer {
     }
 
     tokenize() {
+
+        let guard = 0;
+
         while (!this.isAtEnd()) {
+
+            guard++;
+
+            if (guard > 100000) {
+                throw new Error("Infinite loop detected");
+            }
+
             let char = this.peek();
 
             // whitespace
@@ -19,13 +28,16 @@ class Lexer {
                 continue;
             }
 
-            // comments //
-            if (char === "/" && this.peekNext() === "/") {
-                this.skipLineComment();
+            // comments
+            if (
+                char === "/" &&
+                this.peekNext() === "/"
+            ) {
+                this.skipComment();
                 continue;
             }
 
-            // numbers (int + float)
+            // numbers
             if (this.isDigit(char)) {
                 this.tokens.push(this.number());
                 continue;
@@ -37,16 +49,14 @@ class Lexer {
                 continue;
             }
 
-            // identifiers / keywords
+            // identifiers
             if (this.isAlpha(char)) {
                 this.tokens.push(this.identifier());
                 continue;
             }
 
-            // operators (2 char first)
-            const twoChar = char + this.peekNext();
-
-            const twoCharOps = {
+            // double operators
+            const doubleOps = {
                 "==": TOKENS.EQUAL_EQUAL,
                 "!=": TOKENS.NOT_EQUAL,
                 ">=": TOKENS.GREATER_EQUAL,
@@ -55,56 +65,90 @@ class Lexer {
                 "||": TOKENS.OR
             };
 
-            if (twoCharOps[twoChar]) {
-                this.addToken(twoCharOps[twoChar], twoChar);
+            const pair =
+                char + this.peekNext();
+
+            if (doubleOps[pair]) {
+
+                this.tokens.push({
+                    type: doubleOps[pair],
+                    value: pair
+                });
+
                 this.advance();
                 this.advance();
+
                 continue;
             }
 
-            // single char operators
+            // single operators
             const singleOps = {
+
                 "+": TOKENS.PLUS,
                 "-": TOKENS.MINUS,
                 "*": TOKENS.STAR,
                 "/": TOKENS.SLASH,
+
                 "=": TOKENS.EQUAL,
                 ">": TOKENS.GREATER,
                 "<": TOKENS.LESS,
                 "!": TOKENS.BANG,
+
                 "(": TOKENS.LPAREN,
                 ")": TOKENS.RPAREN,
+
                 "{": TOKENS.LBRACE,
                 "}": TOKENS.RBRACE,
+
                 ";": TOKENS.SEMICOLON
             };
 
             if (singleOps[char]) {
-                this.addToken(singleOps[char], char);
+
+                this.tokens.push({
+                    type: singleOps[char],
+                    value: char
+                });
+
                 this.advance();
                 continue;
             }
 
-            throw new Error(`Unexpected character: ${char}`);
+            throw new Error(
+                "Unexpected character: " + char
+            );
         }
 
-        this.tokens.push({ type: TOKENS.EOF });
+        this.tokens.push({
+            type: TOKENS.EOF
+        });
+
         return this.tokens;
     }
 
-    // ---------- token builders ----------
-
     number() {
+
         let value = "";
 
-        while (this.isDigit(this.peek())) {
+        while (
+            !this.isAtEnd() &&
+            this.isDigit(this.peek())
+        ) {
             value += this.advance();
         }
 
-        // float support
-        if (this.peek() === "." && this.isDigit(this.peekNext())) {
-            value += this.advance(); // .
-            while (this.isDigit(this.peek())) {
+        // float
+        if (
+            this.peek() === "." &&
+            this.isDigit(this.peekNext())
+        ) {
+
+            value += this.advance();
+
+            while (
+                !this.isAtEnd() &&
+                this.isDigit(this.peek())
+            ) {
                 value += this.advance();
             }
         }
@@ -116,31 +160,44 @@ class Lexer {
     }
 
     string() {
-        this.advance(); // "
+
+        this.advance();
 
         let value = "";
-        while (!this.isAtEnd() && this.peek() !== '"') {
 
-            // escape sequences
+        while (
+            !this.isAtEnd() &&
+            this.peek() !== '"'
+        ) {
+
+            // escape support
             if (this.peek() === "\\") {
-                this.advance();
-                const esc = this.advance();
 
-                const map = {
+                this.advance();
+
+                const esc =
+                    this.advance();
+
+                const escapes = {
+
                     n: "\n",
                     t: "\t",
                     '"': '"',
                     "\\": "\\"
                 };
 
-                value += map[esc] || esc;
+                value += escapes[esc] || esc;
                 continue;
             }
 
             value += this.advance();
         }
 
-        this.advance(); // closing "
+        if (this.isAtEnd()) {
+            throw new Error("Unterminated string");
+        }
+
+        this.advance();
 
         return {
             type: TOKENS.STRING,
@@ -149,37 +206,45 @@ class Lexer {
     }
 
     identifier() {
+
         let value = "";
 
-        while (this.isAlphaNumeric(this.peek())) {
+        while (
+            !this.isAtEnd() &&
+            this.isAlphaNumeric(this.peek())
+        ) {
             value += this.advance();
         }
 
         const keywords = {
+
             print: TOKENS.PRINT,
             if: TOKENS.IF,
             else: TOKENS.ELSE,
+
             let: TOKENS.LET,
+
             true: TOKENS.TRUE,
             false: TOKENS.FALSE
         };
 
         return {
-            type: keywords[value] || TOKENS.IDENTIFIER,
+            type:
+                keywords[value] ||
+                TOKENS.IDENTIFIER,
+
             value
         };
     }
 
-    // ---------- helpers ----------
+    skipComment() {
 
-    skipLineComment() {
-        while (!this.isAtEnd() && this.peek() !== "\n") {
+        while (
+            !this.isAtEnd() &&
+            this.peek() !== "\n"
+        ) {
             this.advance();
         }
-    }
-
-    addToken(type, value) {
-        this.tokens.push({ type, value });
     }
 
     peek() {
@@ -198,16 +263,16 @@ class Lexer {
         return this.position >= this.input.length;
     }
 
-    isDigit(c) {
-        return /[0-9]/.test(c);
+    isDigit(char) {
+        return /[0-9]/.test(char);
     }
 
-    isAlpha(c) {
-        return /[a-zA-Z_]/.test(c);
+    isAlpha(char) {
+        return /[a-zA-Z_]/.test(char);
     }
 
-    isAlphaNumeric(c) {
-        return /[a-zA-Z0-9_]/.test(c);
+    isAlphaNumeric(char) {
+        return /[a-zA-Z0-9_]/.test(char);
     }
 }
 
