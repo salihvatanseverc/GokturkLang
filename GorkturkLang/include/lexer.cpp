@@ -1,11 +1,12 @@
-#include <iostream>
+#include "../include/lexer.hpp"
 #include <sstream>
-#include <vector>
 
 using namespace std;
 
 vector<string> tokenize(string kod) {
+
     stringstream ss(kod);
+
     string token;
 
     vector<string> tokens;
