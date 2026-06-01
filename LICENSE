@@ -1,26 +1,29 @@
 ===============================================================================
-                       GÖKTÜRK PROGRAMLAMA DİLİ - LİSANS SÖZLEŞMESİ
+       GÖKTÜRK PROGRAMLAMA DİLİ - FSEK (5846) KORUMA VE LİSANS SÖZLEŞMESİ
 ===============================================================================
 
-Telif Hakkı (c) 2026 Göktürk Programlama Dili. Tüm Hakları Saklıdır.
+Eser Sahibi: Göktürk Programlama Dili
+Telif Hakkı (c) 2026. Tüm Hakları Saklıdır.
 
-1. KULLANIM KISITLAMALARI
-Bu yazılımın kaynak kodları, altyapı dosyaları ve tüm bileşenleri tamamen 
-ÖZEL MÜLK (Proprietary) statüsündedir. Yazılımın ticari amaçlarla (para kazanma, 
-şirket içi kullanım, ürünleştirme, satış veya reklam) kullanılması, kopyalanması, 
-değiştirilmesi veya dağıtılması KESİNLİKLE YASAKTIR.
+Bu yapay zeka/yazılım çekirdek altyapısı ve kaynak kodları, 5846 sayılı Fikir ve 
+Sanat Eserleri Kanunu (FSEK) m. 2/1-1 uyarınca "İlim ve Edebiyat Eseri" niteliğinde 
+olup yasal koruma altındadır.
 
-2. TİCARİ KULLANIM VE İZİN PROSEDÜRÜ
-Bu kodları ticari bir faaliyette kullanmak, geliştirmek veya dağıtmak isteyen 
-herhangi bir gerçek veya tüzel kişi, telif hakkı sahibinden (Göktürk Programlama Dili) 
-yazılı ve resmi izin/lisans almak ZORUNDADIR. İzin alınmadan yapılan tüm ticari 
-kullanımlar yasal takibe tabidir.
+1. ESER SAHİPLİĞİ VE MANEVİ HAKLAR (FSEK m. 14, 15, 16)
+Eseri kamuya sunma, adın belirtilmesi ve eserde değişiklik yapılmasını men etme 
+yetkileri münhasıran eser sahibine (Göktürk Programlama Dili) aittir. Devlet 
+kurumları dahil olmak üzere hiçbir merci, eser sahibinin adı ve izni olmaksızın 
+bu kodları kendilerine aitmiş gibi gösteremez veya tescil edemez.
 
-3. GAYRİTİCARİ (KİŞİSEL) KULLANIM
-Yazılımın ticari olmayan, sadece eğitim, kişisel deneme ve hobi amaçlı kullanımı, 
-kaynak kod üzerinde değişiklik yapılmaması ve telif hakkı ibaresinin korunması 
-şartıyla serbesttir.
+2. MALİ HAKLAR VE TİCARİ KULLANIM KISITLAMASI (FSEK m. 21, 22, 23, 24, 25)
+Bu bilgisayar programının işleme, çoğaltma, yayma, temsil ve işaret, ses ve/veya 
+görüntü nakline yarayan araçlarla umuma arz edilmesi hakları saklıdır. 
+Türkiye Cumhuriyeti devlet kurumlarının resmî projelerindeki operasyonel kullanımı 
+haricinde; her türlü özel ticari kazanç, doğrudan satış veya kapalı kaynaklı 
+projelere entegrasyon süreçleri eser sahibinin YAZILI İZNİNE tabidir.
 
-4. GARANTİ YOKTUR
-BU YAZILIM "OLDUĞU GİBİ" SUNULMAKTADIR. HİÇBİR TİCARİ VEYA HUKUKİ GARANTİ 
-BARINDIRMAZ. KULLANIMDAN DOĞABİLECEK ZARARLARDAN GELİŞTİRİCİ SORUMLU TUTULAMAZ.
+3. YASAL YAPTIRIMLAR VE TAZMİNAT (FSEK m. 68, m. 71)
+Bu lisans şartlarının ihlali, kodların izinsiz ticari amaçla kopyalanması veya 
+değiştirilmesi durumunda; FSEK Madde 68 uyarınca rayiç bedelin ÜÇ KATI (3x) tutarında 
+maddi tazminat davası ve FSEK Madde 71 uyarınca cezai süreç başlatılacaktır.
+===============================================================================
