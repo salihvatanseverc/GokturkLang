@@ -1,25 +1,34 @@
 #ifndef INTERPRETER_HPP
 #define INTERPRETER_HPP
 
-#include "ast.hpp"
-#include <map>
 #include <string>
+#include <unordered_map>
+#include <vector>
 #include <memory>
+#include "../ast/ast.hpp" // ast düğüm tanımlarınız için
 
-class Interpreter {
-public:
-    Interpreter() = default;
+namespace gokturklang {
 
-    // Ana çalıştırma fonksiyonu (Ağacın kökünü alır ve başlatır)
-    void interpret(const ASTNode* root);
-
+class interpreter {
 private:
-    // Değişkenleri ve değerlerini tuttuğumuz yerli belleğimiz (Sembol Tablosu)
-    std::map<std::string, int> m_memory;
+    // değişkenlerin saklandığı ana bellek havuzu
+    std::unordered_map<std::string, int> degiskenlerhavuzu;
 
-    // Yardımcı fonksiyonlar: Her düğüm tipini ayrı ayrı işler
-    int evaluate(const ASTNode* node); // Değer döndüren ifadeler için (Sayı, İşlem)
-    void execute(const ASTNode* node);  // Komutlar için (Değişken tanımlama, Yazdır)
+public:
+    interpreter() = default;
+
+    // tek bir ast düğümünü yorumlar ve çalıştırır
+    int calistir(const astnode* node);
+
+    // tüm programı (düğümler listesini) sırasıyla yürütür
+    void programicalistir(const std::vector<std::unique_ptr<astnode>>& program);
+
+    // değişken havuzuna dışarıdan erişim gerekirse referans döner
+    const std::unordered_map<std::string, int>& havuzugetir() const {
+        return degiskenlerhavuzu;
+    }
 };
 
-#endif // INTERPRETER_HPP
+} // namespace gokturklang
+
+#endif

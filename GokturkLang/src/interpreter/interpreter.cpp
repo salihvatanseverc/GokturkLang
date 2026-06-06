@@ -1,76 +1,62 @@
 #include "interpreter.hpp"
-#include <iostream>
-#include <stdexcept>
+#include "../yazdır altyapısı/yazdir.hpp"
+#include "../matematik yapısı/matematik.hpp"
 
-// İfadeleri (Expression) değerlendirip sayısal sonuç dönen fonksiyon
-int Interpreter::evaluate(const ASTNode* node) {
+namespace gokturklang {
+
+int interpreter::calistir(const astnode* node) {
     if (!node) return 0;
 
-    // 1. Eğer düğüm bir Sayı ise, doğrudan integer'a çevirip dön
-    if (auto numNode = dynamic_cast<const NumberLiteralNode*>(node)) {
-        return std::stoi(numNode->value);
+    // 1. durum: doğrudan sayı düğümü ise değerini dön
+    if (auto numnode = dynamic_cast<const numbernode*>(node)) {
+        return numnode->value;
     }
 
-    // 2. Eğer düğüm bir Değişken Adı ise, hafızadan değerini bul
-    if (auto idNode = dynamic_cast<const IdentifierNode*>(node)) {
-        if (m_memory.find(idNode->name) == m_memory.end()) {
-            throw std::runtime_error("Çalışma Zamanı Hatası: Tanımlanmamış değişken '" + idNode->name + "'");
+    // 2. durum: değişken düğümü ise havuzdan değerini getir
+    if (auto varnode = dynamic_cast<const variablenode*>(node)) {
+        auto it = degiskenlerhavuzu.find(varnode->name);
+        if (it != degiskenlerhavuzu.end()) {
+            return it->second;
         }
-        return m_memory[idNode->name];
+        return 0; // değişken bulunamazsa varsayılan 0 döner
     }
 
-    // 3. Eğer düğüm bir Matematiksel İşlem ise, sol ve sağ tarafı çözüp işlemi yap
-    if (auto binNode = dynamic_cast<const BinaryExpressionNode*>(node)) {
-        int leftVal = evaluate(binNode->left.get());
-        int rightVal = evaluate(binNode->right.get());
+    // 3. durum: atama işlemi (örneğin: x = 5)
+    if (auto assignnode = dynamic_cast<const assignmentnode*>(node)) {
+        int deger = calistir(assignnode->value.get());
+        degiskenlerhavuzu[assignnode->name] = deger;
+        return deger;
+    }
 
-        if (binNode->op == "+") return leftVal + rightVal;
-        if (binNode->op == "-") return leftVal - rightVal;
-        if (binNode->op == "*") return leftVal * rightVal;
-        if (binNode->op == "/") {
-            if (rightVal == 0) throw std::runtime_error("Çalışma Zamanı Hatası: Sıfıra bölme hatası!");
-            return leftVal / rightVal;
+    // 4. durum: matematiksel toplama işlemi (örneğin: 5 + 8 veya x + y)
+    if (auto binnode = dynamic_cast<const binaryopnode*>(node)) {
+        if (binnode->op == "+") {
+            int sol = calistir(binnode->left.get());
+            int sag = calistir(binnode->right.get());
+            return matematikyapisi::sayitopla(sol, sag);
         }
+    }
+
+    // 5. durum: yazdır komutu (örneğin: yazdir x veya yazdir 13)
+    if (auto yazdirnode = dynamic_cast<const yazdirnode*>(node)) {
+        // eğer yazdırılacak şey bir değişken adı ise doğrudan altyapıyı çağırırız
+        if (auto varnode = dynamic_cast<const variablenode*>(yazdirnode->expression.get())) {
+            yazdiraltyapisi::calistir(varnode->name, degiskenlerhavuzu);
+        } else {
+            // eğer yazdırılacak şey doğrudan bir işlem veya sayı ise önce hesaplar sonra basarız
+            int sonuc = calistir(yazdirnode->expression.get());
+            yazdiraltyapisi::metinveyasayiyazdir(std::to_string(sonuc));
+        }
+        return 0;
     }
 
     return 0;
 }
 
-// Komutları (Statement) sırayla çalıştıran fonksiyon
-void Interpreter::execute(const ASTNode* node) {
-    if (!node) return;
-
-    // 1. Değişken Tanımlama Komutu gelirse
-    if (auto varDecl = dynamic_cast<const VariableDeclarationNode*>(node)) {
-        int value = 0;
-        if (varDecl->initializer) {
-            value = evaluate(varDecl->initializer.get()); // Eşittir'in sağını hesapla
-        }
-        m_memory[varDecl->identifier] = value; // Hafızaya kaydet
-        return;
-    }
-
-    // 2. Yazdır Komutu gelirse
-    if (auto printStmt = dynamic_cast<const PrintStatementNode*>(node)) {
-        int value = evaluate(printStmt->expression.get()); // Yazdırılacak değeri hesapla
-        std::cout << value << "\n"; // Konsola bas!
-        return;
-    }
-
-    // 3. Tüm Program (Çoklu satır) gelirse
-    if (auto progNode = dynamic_cast<const ProgramNode*>(node)) {
-        for (const auto& stmt : progNode->statements) {
-            execute(stmt.get()); // Her satırı sırayla çalıştır
-        }
-        return;
+void interpreter::programicalistir(const std::vector<std::unique_ptr<astnode>>& program) {
+    for (const auto& node : program) {
+        calistir(node.get());
     }
 }
 
-// Dışarıdan çağrılan ana yorumlayıcı tetikleyicisi
-void Interpreter::interpret(const ASTNode* root) {
-    try {
-        execute(root);
-    } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
-    }
-}
+} // namespace gokturklang
