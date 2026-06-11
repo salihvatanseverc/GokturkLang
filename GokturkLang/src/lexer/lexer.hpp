@@ -10,10 +10,10 @@ enum class TokenType {
     IDENTIFIER,
     NUMBER,
     STRING,
-    PARANTEZ_AC,   // (
-    PARANTEZ_KAPA, // )
-    ESITTIR,       // =
-    VIRGUL,        // ,
+    PARANTEZ_AC,
+    PARANTEZ_KAPA,
+    ESITTIR,
+    VIRGUL,
     EOF_TOKEN
 };
 

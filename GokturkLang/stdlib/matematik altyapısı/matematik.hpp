@@ -8,29 +8,25 @@ namespace gokturklang {
 
 class matematikyapisi {
 public:
-    // doğrudan iki ham sayıyı toplar (örni: 5 + 8)
+    // toplama işlemi (5 + 8)
     static int sayitopla(int sayi1, int sayi2) {
         return sayi1 + sayi2;
     }
 
-    // bir değişken ile bir sayıyı veya iki değişkeni toplar
-    static int degiskentopla(const std::string& degisken1, const std::string& degisken2, const std::unordered_map<std::string, int>& degiskenlerhavuzu) {
-        int deger1 = 0;
-        int deger2 = 0;
+    // çıkarma işlemi (10 - 4)
+    static int sayicikar(int sayi1, int sayi2) {
+        return sayi1 - sayi2;
+    }
 
-        // birinci parametre kontrolü (havuzda varsa değerini al)
-        auto it1 = degiskenlerhavuzu.find(degisken1);
-        if (it1 != degiskenlerhavuzu.end()) {
-            deger1 = it1->second;
-        }
+    // çarpma işlemi (3 * 4)
+    static int sayicarp(int sayi1, int sayi2) {
+        return sayi1 * sayi2;
+    }
 
-        // ikinci parametre kontrolü (havuzda varsa değerini al)
-        auto it2 = degiskenlerhavuzu.find(degisken2);
-        if (it2 != degiskenlerhavuzu.end()) {
-            deger2 = it2->second;
-        }
-
-        return deger1 + deger2;
+    // bölme işlemi (20 / 5)
+    static int sayibol(int sayi1, int sayi2) {
+        if (sayi2 == 0) return 0; // sıfıra bölünme hatasını önlemek için varsayılan koruma
+        return sayi1 / sayi2;
     }
 };
 
